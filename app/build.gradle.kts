@@ -1,19 +1,16 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // Add this line:
-    kotlin("kapt")
+    kotlin("kapt") // Este es necesario para Glide/Gson si los plugins de la librería están en libs.versions.toml
 }
 
 android {
     namespace = "com.example.videojuegos"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.videojuegos"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -48,7 +45,13 @@ dependencies {
 
     // Glide
     implementation(libs.glide)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.firebase.inappmessaging)
     kapt(libs.glideCompiler)
+
+    // Dependencia añadida para la persistencia (Gson)
+    implementation("com.google.code.gson:gson:2.10.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
