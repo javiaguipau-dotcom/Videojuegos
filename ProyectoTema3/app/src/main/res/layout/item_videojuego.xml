@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:elevation="8dp"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgPortada"
+            android:layout_width="100dp"
+            android:layout_height="140dp"
+            android:scaleType="centerCrop"
+            android:layout_marginRight="10dp"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txtTitulo"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/txtPlataforma"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/txtAño"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnBorrar"
+            android:src="@android:drawable/ic_menu_delete"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_height="20dp"
+            android:layout_width="20dp"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
+
