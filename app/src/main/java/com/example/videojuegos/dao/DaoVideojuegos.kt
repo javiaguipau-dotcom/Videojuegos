@@ -11,24 +11,20 @@ object DaoVideojuegos : InterfaceDao {
 
     private const val FILE_NAME = "videojuegos_data.json"
     private lateinit var appContext: Context
-
     private var lista = mutableListOf<Videojuego>()
 
-    // Datos iniciales (usados solo si el archivo no existe)
     private val defaultList = mutableListOf(
-        Videojuego(1, "The Legend of Zelda: Tears of the Kingdom", "Su trama central narra las heroicas misiones de Link para salvar Hyrule.", "https://via.placeholder.com/150?text=Zelda", 4),
-        Videojuego(2, "Super Mario Bros. Wonder", "Mario es el icónico fontanero italiano, mascota de Nintendo, en una aventura floral.", "https://via.placeholder.com/150?text=Mario", 5),
-        Videojuego(3, "Elden Ring", "Un juego de rol de acción épico ambientado en las Tierras Intermedias.", "https://via.placeholder.com/150?text=EldenRing", 5)
+        Videojuego(1, "The Legend of Zelda", "Misiones de Link para salvar Hyrule.", "https://via.placeholder.com/150", 4),
+        Videojuego(2, "Super Mario Bros. Wonder", "Aventura floral de Mario.", "https://via.placeholder.com/150", 5),
+        Videojuego(3, "Elden Ring", "Juego de rol épico.", "https://via.placeholder.com/150", 5)
     )
 
-    /**
-     * Debe ser llamado al inicio de la aplicación para cargar los datos.
-     */
     fun inicializar(context: Context) {
         appContext = context.applicationContext
         cargarDatos()
     }
 
+    // --- MÉTODOS DE PERSISTENCIA ---
     private fun cargarDatos() {
         try {
             val file = File(appContext.filesDir, FILE_NAME)
@@ -56,11 +52,10 @@ object DaoVideojuegos : InterfaceDao {
         }
     }
 
+    // --- IMPLEMENTACIÓN DE LA INTERFAZ ---
     override fun getAll(): List<Videojuego> = lista.toList()
 
-    override fun getById(id: Int): Videojuego? {
-        return lista.find { it.id == id }
-    }
+    override fun getById(id: Int): Videojuego? = lista.find { it.id == id }
 
     override fun delete(id: Int) {
         lista.removeIf { it.id == id }
@@ -79,4 +74,12 @@ object DaoVideojuegos : InterfaceDao {
             guardarDatos()
         }
     }
+
+    // --- ALIAS PARA COMPATIBILIDAD CON FRAGMENTOS ---
+    // Estas funciones hacen que tus fragmentos funcionen sin cambiar su código
+    override fun obtenerTodos(): List<Videojuego> = getAll()
+
+    override fun obtenerPorId(id: Int): Videojuego? = getById(id)
+
+    override fun eliminar(id: Int) = delete(id)
 }

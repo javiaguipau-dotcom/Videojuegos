@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/listadoFragment">
+
+    <fragment
+        android:id="@+id/listadoFragment"
+        android:name="com.example.videojuegos.fragments.ListadoFragment"
+        android:label="Catálogo">
+        <action
+            android:id="@+id/action_listadoToFormulario"
+            app:destination="@id/formularioFragment" />
+        <action
+            android:id="@+id/action_listadoToDetalle"
+            app:destination="@id/detalleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detalleFragment"
+        android:name="com.example.videojuegos.fragments.DetalleFragment"
+        android:label="Detalle del Juego">
+        <argument
+            android:name="videojuegoId"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/formularioFragment"
+        android:name="com.example.videojuegos.fragments.FormularioFragment"
+        android:label="Formulario">
+        <argument
+            android:name="videojuegoId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/perfilFragment"
+        android:name="com.example.videojuegos.fragments.PerfilFragment"
+        android:label="Mi Perfil" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.videojuegos.fragments.SettingsFragment"
+        android:label="Ajustes" />
+</navigation>

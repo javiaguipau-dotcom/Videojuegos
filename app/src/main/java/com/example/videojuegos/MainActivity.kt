@@ -1,79 +1,82 @@
 package com.example.videojuegos
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.activity.result.contract.ActivityResultContracts
-import com.example.videojuegos.adapter.AdapterVideojuegos
-
-import com.example.videojuegos.controler.VideojuegoController
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.*
 import com.example.videojuegos.dao.DaoVideojuegos
-
-
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var controller: VideojuegoController
-    lateinit var adapter: AdapterVideojuegos
-
-    // Constante para la clave del ID que pasaremos
-    companion object {
-        const val VIDEOJUEGO_ID_KEY = "videojuego_id"
-    }
-
-    private val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                adapter.actualizarLista(controller.cargarVideojuegos())
-                Toast.makeText(this, "Lista actualizada.", Toast.LENGTH_SHORT).show()
-            }
-        }
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. INICIALIZAR PERSISTENCIA Y CARGAR DATOS
         DaoVideojuegos.inicializar(applicationContext)
 
-        // 2. INICIALIZAR EL CONTROLADOR
-        controller = VideojuegoController(DaoVideojuegos)
+        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-        // 3. CONFIGURAR RECYCLERVIEW Y ADAPTER
-        val recycler = findViewById<RecyclerView>(R.id.recyclerView)
-        recycler.layoutManager = LinearLayoutManager(this)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
 
-        adapter = AdapterVideojuegos(
-            listaVideojuegos = controller.cargarVideojuegos(),
-            // onDeleteClickListener
-            onDeleteClickListener = { id ->
-                controller.borrar(id) { nuevaLista ->
-                    adapter.actualizarLista(nuevaLista)
-                    Toast.makeText(this, "Videojuego eliminado.", Toast.LENGTH_SHORT).show()
-                }
-            },
-            // ⬅️ onEditClickListener
-            onEditClickListener = { id ->
-                val intent = Intent(this, FormularioVideojuegoActivity::class.java).apply {
-                    // Pasamos el ID para entrar en modo Edición
-                    putExtra(VIDEOJUEGO_ID_KEY, id)
-                }
-                activityResultLauncher.launch(intent)
-            }
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view)
+        val bottomNav: BottomNavigationView = findViewById(R.id.bottom_nav)
+
+        // CONFIGURAR HEADER (Nombre de usuario)
+        val headerView = navView.getHeaderView(0)
+        val tvUser = headerView.findViewById<TextView>(R.id.tvHeaderNombre)
+        val nombre = intent.getStringExtra("USER_NAME") ?: "Invitado"
+        tvUser.text = nombre
+
+        // DESTINOS TOP-LEVEL (Drawer + BottomNav)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.listadoFragment, R.id.perfilFragment, R.id.settingsFragment),
+            drawerLayout
         )
-        recycler.adapter = adapter
 
-        // 4. CONFIGURAR BOTÓN FAB (Modo Alta)
-        val fab = findViewById<FloatingActionButton>(R.id.fabAdd)
-        fab.setOnClickListener {
-            val intent = Intent(this, FormularioVideojuegoActivity::class.java)
-            // No se pasa ID, entra en modo Alta
-            activityResultLauncher.launch(intent)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+        bottomNav.setupWithNavController(navController)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    // MENÚ DE OPCIONES (3 ítems obligatorios)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                performLogout()
+                true
+            }
+            // Los otros ítems (Settings/Filtro) navegarán automáticamente si el ID coincide con el nav_graph
+            else -> item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun performLogout() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

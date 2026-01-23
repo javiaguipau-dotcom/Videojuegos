@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
-
 
     <application
         android:allowBackup="true"
@@ -15,7 +13,7 @@
         android:theme="@style/Theme.Videojuegos">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,9 +22,9 @@
         </activity>
 
         <activity
-            android:name=".FormularioVideojuegoActivity"
+            android:name=".MainActivity"
             android:exported="false"
-            android:label="Formulario" />
+            android:windowSoftInputMode="adjustPan" />
 
     </application>
 </manifest>
