@@ -1,4 +1,4 @@
-package com.example.videojuegos.fragments
+package com.example.videojuegos.presentation.ui.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -8,20 +8,21 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.videojuegos.R
-import com.example.videojuegos.controler.VideojuegoController
-import com.example.videojuegos.dao.DaoVideojuegos
-import com.example.videojuegos.models.Videojuego
+import com.example.videojuegos.domain.models.Videojuego
+import com.example.videojuegos.presentation.viewmodel.VideojuegoViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FormularioFragment : Fragment(R.layout.activity_add_videojuego) {
 
-    // 1. Argumentos Seguros (Safe Args)
+    private val viewModel: VideojuegoViewModel by viewModels()
     private val args: FormularioFragmentArgs by navArgs()
 
-    private lateinit var controller: VideojuegoController
     private var imagenUri: Uri? = null
     private var juegoAEditar: Videojuego? = null
 
@@ -32,17 +33,15 @@ class FormularioFragment : Fragment(R.layout.activity_add_videojuego) {
     private lateinit var imgPrevisualizacion: ImageView
     private lateinit var btnGuardar: Button
 
-    // 2. Launcher para la Galería (Adaptado para Fragment)
+    // Launcher para la Galería
     private val selectImageLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             imagenUri = result.data?.data
             imagenUri?.let { uri ->
-                // Permisos persistentes
                 val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
-
                 Glide.with(this).load(uri).into(imgPrevisualizacion)
             }
         }
@@ -51,10 +50,7 @@ class FormularioFragment : Fragment(R.layout.activity_add_videojuego) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Inicializar controlador
-        controller = VideojuegoController(DaoVideojuegos)
-
-        // 3. Vincular Vistas
+        // Vincular Vistas
         etNombre = view.findViewById(R.id.txtNombre)
         etDescripcion = view.findViewById(R.id.txtDescripcion)
         ratingBarForm = view.findViewById(R.id.ratingBarPuntuacion)
@@ -62,15 +58,27 @@ class FormularioFragment : Fragment(R.layout.activity_add_videojuego) {
         btnGuardar = view.findViewById(R.id.btnGuardarVideojuego)
         val btnSeleccionar = view.findViewById<Button>(R.id.btnSeleccionarImagen)
 
-        // 4. Lógica de Edición vs Alta
-        val videojuegoId = args.videojuegoId
-        if (videojuegoId != -1) {
-            juegoAEditar = controller.cargarVideojuegoPorId(videojuegoId)
-            cargarDatosParaEdicion()
-            btnGuardar.text = "Guardar Cambios"
+        // Observar errores
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            if (!error.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+            }
         }
 
-        // 5. Click: Seleccionar Imagen
+        // Lógica de Edición vs Alta
+        val videojuegoId = args.videojuegoId
+        if (videojuegoId != -1) {
+            viewModel.cargarVideojuegoPorId(videojuegoId)
+            viewModel.videojuegoDetalle.observe(viewLifecycleOwner) { videojuego ->
+                if (videojuego != null) {
+                    juegoAEditar = videojuego
+                    cargarDatosParaEdicion(videojuego)
+                    btnGuardar.text = "Guardar Cambios"
+                }
+            }
+        }
+
+        // Click: Seleccionar Imagen
         btnSeleccionar.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
@@ -80,20 +88,18 @@ class FormularioFragment : Fragment(R.layout.activity_add_videojuego) {
             selectImageLauncher.launch(intent)
         }
 
-        // 6. Click: Guardar
+        // Click: Guardar
         btnGuardar.setOnClickListener {
             guardarVideojuego()
         }
     }
 
-    private fun cargarDatosParaEdicion() {
-        juegoAEditar?.let { juego ->
-            etNombre.setText(juego.nombre)
-            etDescripcion.setText(juego.descripcion)
-            ratingBarForm.rating = juego.puntuacion.toFloat()
-            Glide.with(this).load(juego.imagenUrl).into(imgPrevisualizacion)
-            imagenUri = Uri.parse(juego.imagenUrl)
-        }
+    private fun cargarDatosParaEdicion(videojuego: Videojuego) {
+        etNombre.setText(videojuego.nombre)
+        etDescripcion.setText(videojuego.descripcion)
+        ratingBarForm.rating = videojuego.puntuacion.toFloat()
+        Glide.with(this).load(videojuego.imagenUrl).into(imgPrevisualizacion)
+        imagenUri = Uri.parse(videojuego.imagenUrl)
     }
 
     private fun guardarVideojuego() {
@@ -115,17 +121,16 @@ class FormularioFragment : Fragment(R.layout.activity_add_videojuego) {
                 imagenUrl = imagenPath,
                 puntuacion = puntuacion
             )
-            controller.editar(actualizado)
+            viewModel.actualizarVideojuego(actualizado)
             Toast.makeText(requireContext(), "Actualizado con éxito", Toast.LENGTH_SHORT).show()
         } else {
-            // INSERTAR
-            val newId = (controller.cargarVideojuegos().maxOfOrNull { it.id } ?: 0) + 1
+            // INSERTAR - Generar nuevo ID
+            val newId = (viewModel.videojuegos.value?.maxOfOrNull { it.id } ?: 0) + 1
             val nuevo = Videojuego(newId, nombre, descripcion, imagenPath, puntuacion)
-            controller.insertar(nuevo)
+            viewModel.agregarVideojuego(nuevo)
             Toast.makeText(requireContext(), "Añadido con éxito", Toast.LENGTH_SHORT).show()
         }
 
-        // 7. Navegación hacia atrás (Vuelve automáticamente al listado)
         findNavController().popBackStack()
     }
 }

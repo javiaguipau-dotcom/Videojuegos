@@ -1,4 +1,4 @@
-package com.example.videojuegos
+package com.example.videojuegos.presentation.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,10 +10,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
-import com.example.videojuegos.dao.DaoVideojuegos
+import com.example.videojuegos.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -22,8 +24,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        DaoVideojuegos.inicializar(applicationContext)
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    // MENÚ DE OPCIONES (3 ítems obligatorios)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -68,7 +67,6 @@ class MainActivity : AppCompatActivity() {
                 performLogout()
                 true
             }
-            // Los otros ítems (Settings/Filtro) navegarán automáticamente si el ID coincide con el nav_graph
             else -> item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
         }
     }

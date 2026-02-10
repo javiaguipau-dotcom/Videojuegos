@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/listadoFragment"
-        android:name="com.example.videojuegos.fragments.ListadoFragment"
+        android:name="com.example.videojuegos.presentation.ui.fragments.ListadoFragment"
         android:label="Catálogo">
         <action
             android:id="@+id/action_listadoToFormulario"
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/detalleFragment"
-        android:name="com.example.videojuegos.fragments.DetalleFragment"
+        android:name="com.example.videojuegos.presentation.ui.fragments.DetalleFragment"
         android:label="Detalle del Juego">
         <argument
             android:name="videojuegoId"
@@ -28,7 +28,7 @@
 
     <fragment
         android:id="@+id/formularioFragment"
-        android:name="com.example.videojuegos.fragments.FormularioFragment"
+        android:name="com.example.videojuegos.presentation.ui.fragments.FormularioFragment"
         android:label="Formulario">
         <argument
             android:name="videojuegoId"
@@ -38,11 +38,11 @@
 
     <fragment
         android:id="@+id/perfilFragment"
-        android:name="com.example.videojuegos.fragments.PerfilFragment"
+        android:name="com.example.videojuegos.presentation.ui.fragments.PerfilFragment"
         android:label="Mi Perfil" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.videojuegos.fragments.SettingsFragment"
+        android:name="com.example.videojuegos.presentation.ui.fragments.SettingsFragment"
         android:label="Ajustes" />
 </navigation>

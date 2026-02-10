@@ -1,4 +1,4 @@
-package com.example.videojuegos
+package com.example.videojuegos.presentation.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,18 +6,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.videojuegos.R
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Verificamos que cada ID exista en el XML
         val etUser = findViewById<EditText>(R.id.etUsuario)
         val etPass = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
-
-        // Estos botones son obligatorios por el enunciado
         val btnRegister = findViewById<Button>(R.id.btnRegistro)
         val btnForgot = findViewById<Button>(R.id.btnRecuperar)
 
@@ -33,6 +31,15 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Credenciales: admin / 1234", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // Botones de registro y recuperación (sin implementación)
+        btnRegister.setOnClickListener {
+            Toast.makeText(this, "Función de registro no implementada", Toast.LENGTH_SHORT).show()
+        }
+
+        btnForgot.setOnClickListener {
+            Toast.makeText(this, "Función de recuperación no implementada", Toast.LENGTH_SHORT).show()
         }
     }
 }

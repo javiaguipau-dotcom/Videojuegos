@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
 
     <application
+        android:name=".VideojuegosApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -13,7 +14,7 @@
         android:theme="@style/Theme.Videojuegos">
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".presentation.ui.activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +23,7 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.ui.activities.MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
 

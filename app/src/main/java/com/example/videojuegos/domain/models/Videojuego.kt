@@ -1,4 +1,5 @@
-package com.example.videojuegos.models
+package com.example.videojuegos.domain.models
+
 data class Videojuego(
     val id: Int,
     val nombre: String,

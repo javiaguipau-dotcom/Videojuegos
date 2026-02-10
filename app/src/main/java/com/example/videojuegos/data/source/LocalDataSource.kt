@@ -1,16 +1,15 @@
-package com.example.videojuegos.dao
+package com.example.videojuegos.data.source
 
 import android.content.Context
-import com.example.videojuegos.interfaces.InterfaceDao
-import com.example.videojuegos.models.Videojuego
+import com.example.videojuegos.domain.models.Videojuego
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.io.*
+import java.io.File
 
-object DaoVideojuegos : InterfaceDao {
+class LocalDataSource(context: Context) {
 
-    private const val FILE_NAME = "videojuegos_data.json"
-    private lateinit var appContext: Context
+    private val appContext = context.applicationContext
+    private val FILE_NAME = "videojuegos_data.json"
     private var lista = mutableListOf<Videojuego>()
 
     private val defaultList = mutableListOf(
@@ -19,12 +18,10 @@ object DaoVideojuegos : InterfaceDao {
         Videojuego(3, "Elden Ring", "Juego de rol épico.", "https://via.placeholder.com/150", 5)
     )
 
-    fun inicializar(context: Context) {
-        appContext = context.applicationContext
+    init {
         cargarDatos()
     }
 
-    // --- MÉTODOS DE PERSISTENCIA ---
     private fun cargarDatos() {
         try {
             val file = File(appContext.filesDir, FILE_NAME)
@@ -52,34 +49,48 @@ object DaoVideojuegos : InterfaceDao {
         }
     }
 
-    // --- IMPLEMENTACIÓN DE LA INTERFAZ ---
-    override fun getAll(): List<Videojuego> = lista.toList()
+    // MÉTODOS LOCALES
+    fun getAll(): List<Videojuego> = lista.toList()
 
-    override fun getById(id: Int): Videojuego? = lista.find { it.id == id }
+    fun getById(id: Int): Videojuego? = lista.find { it.id == id }
 
-    override fun delete(id: Int) {
-        lista.removeIf { it.id == id }
-        guardarDatos()
-    }
-
-    override fun insertar(videojuego: Videojuego) {
-        lista.add(videojuego)
-        guardarDatos()
-    }
-
-    override fun update(videojuego: Videojuego) {
-        val index = lista.indexOfFirst { it.id == videojuego.id }
-        if (index != -1) {
-            lista[index] = videojuego
+    fun save(videojuego: Videojuego): Boolean {
+        return try {
+            lista.add(videojuego)
             guardarDatos()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 
-    // --- ALIAS PARA COMPATIBILIDAD CON FRAGMENTOS ---
-    // Estas funciones hacen que tus fragmentos funcionen sin cambiar su código
-    override fun obtenerTodos(): List<Videojuego> = getAll()
+    fun update(videojuego: Videojuego): Boolean {
+        return try {
+            val index = lista.indexOfFirst { it.id == videojuego.id }
+            if (index != -1) {
+                lista[index] = videojuego
+                guardarDatos()
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
 
-    override fun obtenerPorId(id: Int): Videojuego? = getById(id)
-
-    override fun eliminar(id: Int) = delete(id)
+    fun delete(id: Int): Boolean {
+        return try {
+            val result = lista.removeIf { it.id == id }
+            if (result) {
+                guardarDatos()
+            }
+            result
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
 }

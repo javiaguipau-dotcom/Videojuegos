@@ -1,4 +1,4 @@
-package com.example.videojuegos.adapter // ⬅️ Paquete del adaptador
+package com.example.videojuegos.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +9,8 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.videojuegos.R // ⬅️ ¡CRUCIAL! Importa R del paquete base de la aplicación
-import com.example.videojuegos.models.Videojuego
+import com.example.videojuegos.R
+import com.example.videojuegos.domain.models.Videojuego
 
 typealias VideojuegoList = List<Videojuego>
 
@@ -41,7 +41,6 @@ class AdapterVideojuegos(
         // Cargar imagen
         Glide.with(holder.itemView.context)
             .load(videojuego.imagenUrl)
-            // Asegúrate de que ic_launcher_foreground exista en R.drawable
             .placeholder(R.drawable.ic_launcher_foreground)
             .error(R.drawable.ic_launcher_foreground)
             .into(holder.imgJuego)
